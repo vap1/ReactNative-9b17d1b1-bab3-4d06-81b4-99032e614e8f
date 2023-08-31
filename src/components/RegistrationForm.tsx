@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { UserRegistrationRequest } from '../types/Types';
-import { registerUser } from '../apis/UserApi';
+import UserApi from '../apis/UserApi';
 
 const RegistrationForm: React.FC = () => {
   const [name, setName] = useState('');
@@ -17,7 +17,7 @@ const RegistrationForm: React.FC = () => {
         password,
       };
 
-      const response = await registerUser(request);
+      const response = await UserApi.registerUser(request);
       console.log(response); // Handle the response as per your requirement
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
