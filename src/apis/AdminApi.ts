@@ -1,18 +1,18 @@
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { AdminUserDetailsRequest, AdminUserDetailsResponse } from '../types/Types';
 
-const API_URL = 'https://example.com/api'; // Replace with your actual API URL
+const BASE_URL = 'https://api.example.com';
 
-export const getAdminUserDetails = async (request: AdminUserDetailsRequest): Promise<AdminUserDetailsResponse> => {
+const getAdminUserDetails = async (request: AdminUserDetailsRequest): Promise<AdminUserDetailsResponse> => {
   try {
-    const response = await axios.get(`${API_URL}/admin/users`, {
-      headers: {
-        Authorization: `Bearer ${request.token}`,
-      },
-    });
-    return response.data as AdminUserDetailsResponse;
+    const response: AxiosResponse<AdminUserDetailsResponse> = await axios.get(`${BASE_URL}/api/admin/users`, { headers: { Authorization: `Bearer ${request.token}` } });
+    return response.data;
   } catch (error) {
     throw new Error('Failed to get admin user details');
   }
+};
+
+export default {
+  getAdminUserDetails,
 };
