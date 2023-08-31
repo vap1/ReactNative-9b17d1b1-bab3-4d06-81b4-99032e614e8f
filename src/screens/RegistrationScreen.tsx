@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { UserRegistrationRequest } from '../types/Types';
-import { registerUser } from '../apis/UserApi';
+import { UserRegistrationRequest, UserRegistrationResponse } from '../types/Types';
+import UserApi from '../apis/UserApi';
 
 const RegistrationScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleRegistration = async () => {
     try {
@@ -17,8 +18,14 @@ const RegistrationScreen: React.FC = () => {
         password,
       };
 
-      const response = await registerUser(request);
-      console.log(response); // Handle the response as per your requirement
+      const response: UserRegistrationResponse = await UserApi.registerUser(request);
+      if (response.success) {
+        // Registration successful, navigate to the next screen
+        // Replace 'NextScreen' with the actual name of the next screen
+        // navigation.navigate('NextScreen');
+      } else {
+        setErrorMessage(response.message);
+      }
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
     }
@@ -46,6 +53,7 @@ const RegistrationScreen: React.FC = () => {
         onChangeText={setPassword}
       />
       <Button title="Register" onPress={handleRegistration} />
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };
@@ -62,6 +70,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 16,
   },
 });
 
