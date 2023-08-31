@@ -1,84 +1,43 @@
 
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse } from '../types/Types';
-import { getUserProfile, updateUserProfile } from '../apis/ProfileApi';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { UserProfileRequest, UserProfileResponse } from '../types/Types';
+import { getUserProfile } from '../apis/ProfileApi';
 
-interface ProfileScreenProps {
-  token: string;
-}
-
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ token }) => {
-  const [name, setName] = useState('');
-  const [contactInfo, setContactInfo] = useState('');
-  const [address, setAddress] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
+const ProfileScreen: React.FC = () => {
+  const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const request: UserProfileRequest = {
+          token: 'YOUR_USER_TOKEN', // Replace with the actual user token
+        };
+
+        const response: UserProfileResponse = await getUserProfile(request);
+        setUserProfile(response);
+      } catch (error) {
+        console.error(error); // Handle the error as per your requirement
+      }
+    };
+
     fetchUserProfile();
   }, []);
 
-  const fetchUserProfile = async () => {
-    try {
-      const request: UserProfileRequest = {
-        token,
-      };
-
-      const response: UserProfileResponse = await getUserProfile(request);
-      const { user } = response;
-      setName(user.name);
-      setContactInfo(user.contactInfo || '');
-      setAddress(user.address || '');
-      setProfilePicture(user.profilePicture || '');
-    } catch (error) {
-      console.error(error); // Handle the error as per your requirement
-    }
-  };
-
-  const handleProfileUpdate = async () => {
-    try {
-      const request: UserProfileUpdateRequest = {
-        token,
-        name,
-        contactInfo,
-        address,
-        profilePicture,
-      };
-
-      const response: UserProfileUpdateResponse = await updateUserProfile(request);
-      console.log(response); // Handle the response as per your requirement
-    } catch (error) {
-      console.error(error); // Handle the error as per your requirement
-    }
-  };
-
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contact Info"
-        value={contactInfo}
-        onChangeText={setContactInfo}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Address"
-        value={address}
-        onChangeText={setAddress}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Profile Picture"
-        value={profilePicture}
-        onChangeText={setProfilePicture}
-      />
-      <Button title="Save" onPress={handleProfileUpdate} />
+      {userProfile ? (
+        <>
+          <Text style={styles.heading}>Profile</Text>
+          <Text>Name: {userProfile.user.name}</Text>
+          <Text>Email: {userProfile.user.email}</Text>
+          <Text>Contact Info: {userProfile.user.contactInfo}</Text>
+          <Text>Address: {userProfile.user.address}</Text>
+          <Text>Profile Picture: {userProfile.user.profilePicture}</Text>
+        </>
+      ) : (
+        <Text>Loading...</Text>
+      )}
     </View>
   );
 };
@@ -89,12 +48,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 16,
-    paddingHorizontal: 8,
   },
 });
 
