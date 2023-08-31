@@ -1,40 +1,52 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { UserProfileRequest, UserProfileResponse } from '../types/Types';
-import { getUserProfile } from '../apis/ProfileApi';
+import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse, User } from '../types/Types';
+import { getUserProfile, updateUserProfile } from '../apis/ProfileApi';
+import ProfileForm from '../components/ProfileForm';
 
-const ProfileScreen: React.FC = () => {
-  const [userProfile, setUserProfile] = useState<UserProfileResponse | null>(null);
+interface ProfileScreenProps {
+  token: string;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ token }) => {
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const request: UserProfileRequest = {
-          token: 'YOUR_USER_TOKEN', // Replace with the actual user token
-        };
-
-        const response: UserProfileResponse = await getUserProfile(request);
-        setUserProfile(response);
-      } catch (error) {
-        console.error(error); // Handle the error as per your requirement
-      }
-    };
-
     fetchUserProfile();
   }, []);
 
+  const fetchUserProfile = async () => {
+    try {
+      const request: UserProfileRequest = {
+        token,
+      };
+
+      const response: UserProfileResponse = await getUserProfile(request);
+      setUser(response.user);
+    } catch (error) {
+      console.error(error); // Handle the error as per your requirement
+    }
+  };
+
+  const handleProfileUpdate = async (updatedUser: User) => {
+    try {
+      const request: UserProfileUpdateRequest = {
+        token,
+        ...updatedUser,
+      };
+
+      const response: UserProfileUpdateResponse = await updateUserProfile(request);
+      console.log(response); // Handle the response as per your requirement
+    } catch (error) {
+      console.error(error); // Handle the error as per your requirement
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {userProfile ? (
-        <>
-          <Text style={styles.heading}>Profile</Text>
-          <Text>Name: {userProfile.user.name}</Text>
-          <Text>Email: {userProfile.user.email}</Text>
-          <Text>Contact Info: {userProfile.user.contactInfo}</Text>
-          <Text>Address: {userProfile.user.address}</Text>
-          <Text>Profile Picture: {userProfile.user.profilePicture}</Text>
-        </>
+      {user ? (
+        <ProfileForm user={user} onProfileUpdate={handleProfileUpdate} />
       ) : (
         <Text>Loading...</Text>
       )}
@@ -47,11 +59,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 16,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
   },
 });
 
