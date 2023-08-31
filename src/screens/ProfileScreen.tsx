@@ -2,41 +2,37 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse, User } from '../types/Types';
-import { getUserProfile, updateUserProfile } from '../apis/ProfileApi';
+import ProfileApi from '../apis/ProfileApi';
 import ProfileForm from '../components/ProfileForm';
 
-interface ProfileScreenProps {
-  token: string;
-}
-
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ token }) => {
+const ProfileScreen: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const request: UserProfileRequest = {
+          token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
+        };
+
+        const response: UserProfileResponse = await ProfileApi.getUserProfile(request);
+        setUser(response.user);
+      } catch (error) {
+        console.error(error); // Handle the error as per your requirement
+      }
+    };
+
     fetchUserProfile();
   }, []);
-
-  const fetchUserProfile = async () => {
-    try {
-      const request: UserProfileRequest = {
-        token,
-      };
-
-      const response: UserProfileResponse = await getUserProfile(request);
-      setUser(response.user);
-    } catch (error) {
-      console.error(error); // Handle the error as per your requirement
-    }
-  };
 
   const handleProfileUpdate = async (updatedUser: User) => {
     try {
       const request: UserProfileUpdateRequest = {
-        token,
+        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
         ...updatedUser,
       };
 
-      const response: UserProfileUpdateResponse = await updateUserProfile(request);
+      const response: UserProfileUpdateResponse = await ProfileApi.updateUserProfile(request);
       console.log(response); // Handle the response as per your requirement
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
