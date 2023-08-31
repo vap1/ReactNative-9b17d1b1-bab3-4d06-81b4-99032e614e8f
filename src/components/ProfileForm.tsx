@@ -1,62 +1,94 @@
 
 import React, { useState } from 'react';
-import { View, TextInput, Button } from 'react-native';
-import { UserProfileUpdateRequest } from '../types/Types';
-import { updateUserProfile } from '../apis/ProfileApi';
+import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse } from '../types/Types';
+import ProfileApi from '../apis/ProfileApi';
 
-interface ProfileFormProps {
-  token: string;
-}
-
-const ProfileForm: React.FC<ProfileFormProps> = ({ token }) => {
+const ProfileForm: React.FC = () => {
   const [name, setName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [address, setAddress] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
 
-  const handleSaveProfile = () => {
-    const request: UserProfileUpdateRequest = {
-      token,
-      name,
-      contactInfo,
-      address,
-      profilePicture,
-    };
+  const handleGetProfile = async () => {
+    try {
+      const request: UserProfileRequest = {
+        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
+      };
 
-    updateUserProfile(request)
-      .then((response) => {
-        console.log(response.message);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      const response: UserProfileResponse = await ProfileApi.getUserProfile(request);
+      const { user } = response;
+      setName(user.name);
+      setContactInfo(user.contactInfo || '');
+      setAddress(user.address || '');
+      setProfilePicture(user.profilePicture || '');
+    } catch (error) {
+      console.error(error); // Handle the error as per your requirement
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      const request: UserProfileUpdateRequest = {
+        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
+        name,
+        contactInfo,
+        address,
+        profilePicture,
+      };
+
+      const response: UserProfileUpdateResponse = await ProfileApi.updateUserProfile(request);
+      console.log(response); // Handle the response as per your requirement
+    } catch (error) {
+      console.error(error); // Handle the error as per your requirement
+    }
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <TextInput
+        style={styles.input}
         placeholder="Name"
         value={name}
         onChangeText={setName}
       />
       <TextInput
+        style={styles.input}
         placeholder="Contact Info"
         value={contactInfo}
         onChangeText={setContactInfo}
       />
       <TextInput
+        style={styles.input}
         placeholder="Address"
         value={address}
         onChangeText={setAddress}
       />
       <TextInput
+        style={styles.input}
         placeholder="Profile Picture"
         value={profilePicture}
         onChangeText={setProfilePicture}
       />
-      <Button title="Save" onPress={handleSaveProfile} />
+      <Button title="Get Profile" onPress={handleGetProfile} />
+      <Button title="Update Profile" onPress={handleUpdateProfile} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+});
 
 export default ProfileForm;
