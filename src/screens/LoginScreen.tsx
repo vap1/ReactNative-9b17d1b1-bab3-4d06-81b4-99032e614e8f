@@ -1,26 +1,31 @@
 
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { UserLoginRequest } from '../types/Types';
-import { loginUser } from '../apis/AuthApi';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import { UserLoginRequest, UserLoginResponse } from '../types/Types';
+import AuthApi from '../apis/AuthApi';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
-    const request: UserLoginRequest = {
-      email,
-      password,
-    };
-
     try {
-      const response = await loginUser(request);
-      console.log(response);
-      // Handle successful login
+      const request: UserLoginRequest = {
+        email,
+        password,
+      };
+
+      const response: UserLoginResponse = await AuthApi.loginUser(request);
+      if (response.success) {
+        // Login successful, navigate to the next screen
+        // Replace 'NextScreen' with the actual name of the next screen
+        // navigation.navigate('NextScreen');
+      } else {
+        setErrorMessage(response.message);
+      }
     } catch (error) {
-      console.error(error);
-      // Handle login error
+      console.error(error); // Handle the error as per your requirement
     }
   };
 
@@ -40,6 +45,7 @@ const LoginScreen: React.FC = () => {
         onChangeText={setPassword}
       />
       <Button title="Login" onPress={handleLogin} />
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };
@@ -48,16 +54,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
   },
   input: {
-    width: '100%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 16,
   },
 });
 
