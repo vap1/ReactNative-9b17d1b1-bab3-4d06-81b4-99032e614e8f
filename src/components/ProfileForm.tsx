@@ -1,19 +1,27 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { UserProfileRequest, UserProfileUpdateRequest, UserProfileResponse, UserProfileUpdateResponse } from '../types/Types';
+import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse } from '../types/Types';
 import { getUserProfile, updateUserProfile } from '../apis/ProfileApi';
 
-const ProfileForm: React.FC = () => {
+interface ProfileFormProps {
+  token: string;
+}
+
+const ProfileForm: React.FC<ProfileFormProps> = ({ token }) => {
   const [name, setName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [address, setAddress] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
 
-  const handleGetProfile = async () => {
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
     try {
       const request: UserProfileRequest = {
-        token: 'YOUR_USER_TOKEN', // Replace with the actual user token
+        token,
       };
 
       const response: UserProfileResponse = await getUserProfile(request);
@@ -27,10 +35,10 @@ const ProfileForm: React.FC = () => {
     }
   };
 
-  const handleUpdateProfile = async () => {
+  const handleProfileUpdate = async () => {
     try {
       const request: UserProfileUpdateRequest = {
-        token: 'YOUR_USER_TOKEN', // Replace with the actual user token
+        token,
         name,
         contactInfo,
         address,
@@ -70,8 +78,7 @@ const ProfileForm: React.FC = () => {
         value={profilePicture}
         onChangeText={setProfilePicture}
       />
-      <Button title="Get Profile" onPress={handleGetProfile} />
-      <Button title="Update Profile" onPress={handleUpdateProfile} />
+      <Button title="Save" onPress={handleProfileUpdate} />
     </View>
   );
 };
