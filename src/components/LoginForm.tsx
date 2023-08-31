@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { UserLoginRequest } from '../types/Types';
-import { loginUser } from '../apis/AuthApi';
+import AuthApi from '../apis/AuthApi';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ const LoginForm: React.FC = () => {
         password,
       };
 
-      const response = await loginUser(request);
+      const response = await AuthApi.loginUser(request);
       console.log(response); // Handle the response as per your requirement
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
