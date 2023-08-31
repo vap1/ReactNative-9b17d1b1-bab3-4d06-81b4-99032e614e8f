@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import { UserLoginRequest, UserLoginResponse } from '../types/Types';
-import { loginUser } from '../apis/AuthApi';
+import AuthApi from '../apis/AuthApi';
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
     try {
@@ -15,8 +16,14 @@ const LoginScreen: React.FC = () => {
         password,
       };
 
-      const response: UserLoginResponse = await loginUser(request);
-      console.log(response); // Handle the response as per your requirement
+      const response: UserLoginResponse = await AuthApi.loginUser(request);
+      if (response.success) {
+        // Login successful, navigate to the next screen
+        // Replace 'NextScreen' with the actual name of the next screen
+        // navigation.navigate('NextScreen');
+      } else {
+        setErrorMessage(response.message);
+      }
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
     }
@@ -38,6 +45,7 @@ const LoginScreen: React.FC = () => {
         onChangeText={setPassword}
       />
       <Button title="Login" onPress={handleLogin} />
+      {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
     </View>
   );
 };
@@ -54,6 +62,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 16,
   },
 });
 
