@@ -1,30 +1,22 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse } from '../types/Types';
-import { getUserProfile, updateUserProfile } from '../apis/ProfileApi';
+import { UserProfileRequest, UserProfileUpdateRequest, UserProfileResponse, UserProfileUpdateResponse } from '../types/Types';
+import ProfileApi from '../apis/ProfileApi';
 
-interface ProfileFormProps {
-  token: string;
-}
-
-const ProfileForm: React.FC<ProfileFormProps> = ({ token }) => {
+const ProfileForm: React.FC = () => {
   const [name, setName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [address, setAddress] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  const fetchUserProfile = async () => {
+  const handleGetProfile = async () => {
     try {
       const request: UserProfileRequest = {
-        token,
+        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
       };
 
-      const response: UserProfileResponse = await getUserProfile(request);
+      const response: UserProfileResponse = await ProfileApi.getUserProfile(request);
       const { user } = response;
       setName(user.name);
       setContactInfo(user.contactInfo || '');
@@ -35,17 +27,17 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ token }) => {
     }
   };
 
-  const handleProfileUpdate = async () => {
+  const handleUpdateProfile = async () => {
     try {
       const request: UserProfileUpdateRequest = {
-        token,
+        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
         name,
         contactInfo,
         address,
         profilePicture,
       };
 
-      const response: UserProfileUpdateResponse = await updateUserProfile(request);
+      const response: UserProfileUpdateResponse = await ProfileApi.updateUserProfile(request);
       console.log(response); // Handle the response as per your requirement
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
@@ -78,7 +70,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ token }) => {
         value={profilePicture}
         onChangeText={setProfilePicture}
       />
-      <Button title="Save" onPress={handleProfileUpdate} />
+      <Button title="Get Profile" onPress={handleGetProfile} />
+      <Button title="Update Profile" onPress={handleUpdateProfile} />
     </View>
   );
 };
