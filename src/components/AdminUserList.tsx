@@ -2,43 +2,37 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { AdminUserDetailsRequest, AdminUserDetailsResponse, User } from '../types/Types';
-import { getAdminUserDetails } from '../apis/AdminApi';
+import AdminApi from '../apis/AdminApi';
 
 const AdminUserList: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
+    const fetchAdminUserDetails = async () => {
+      try {
+        const request: AdminUserDetailsRequest = {
+          token: 'YOUR_ADMIN_AUTH_TOKEN', // Replace with the actual admin token
+        };
+
+        const response: AdminUserDetailsResponse = await AdminApi.getAdminUserDetails(request);
+        setUsers(response.users);
+      } catch (error) {
+        console.error(error); // Handle the error as per your requirement
+      }
+    };
+
     fetchAdminUserDetails();
   }, []);
 
-  const fetchAdminUserDetails = async () => {
-    try {
-      const request: AdminUserDetailsRequest = {
-        token: 'ADMIN_JWT_TOKEN', // Replace with the actual admin JWT token
-      };
-
-      const response: AdminUserDetailsResponse = await getAdminUserDetails(request);
-      setUsers(response.users);
-    } catch (error) {
-      console.error(error); // Handle the error as per your requirement
-    }
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Admin User Details</Text>
+      <Text style={styles.heading}>Admin User List</Text>
       {users.map((user) => (
         <View key={user.email} style={styles.userContainer}>
-          <Text style={styles.label}>Name:</Text>
-          <Text>{user.name}</Text>
-          <Text style={styles.label}>Email:</Text>
-          <Text>{user.email}</Text>
-          <Text style={styles.label}>Contact Info:</Text>
-          <Text>{user.contactInfo}</Text>
-          <Text style={styles.label}>Address:</Text>
-          <Text>{user.address}</Text>
-          <Text style={styles.label}>Profile Picture:</Text>
-          <Text>{user.profilePicture}</Text>
+          <Text style={styles.userEmail}>{user.email}</Text>
+          <Text style={styles.userName}>{user.name}</Text>
+          <Text style={styles.userContactInfo}>{user.contactInfo}</Text>
+          <Text style={styles.userAddress}>{user.address}</Text>
         </View>
       ))}
     </View>
@@ -59,8 +53,18 @@ const styles = StyleSheet.create({
   userContainer: {
     marginBottom: 16,
   },
-  label: {
+  userEmail: {
+    fontSize: 16,
     fontWeight: 'bold',
+  },
+  userName: {
+    fontSize: 14,
+  },
+  userContactInfo: {
+    fontSize: 14,
+  },
+  userAddress: {
+    fontSize: 14,
   },
 });
 
