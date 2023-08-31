@@ -2,13 +2,9 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { UserLoginRequest } from '../types/Types';
-import { loginUser } from '../apis/AuthApi';
+import AuthApi from '../apis/AuthApi';
 
-interface LoginFormProps {
-  onLoginSuccess: () => void;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
+const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -19,15 +15,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         password,
       };
 
-      const response = await loginUser(request);
-
-      if (response.success) {
-        onLoginSuccess();
-      } else {
-        // Handle login error
-      }
+      const response = await AuthApi.loginUser(request);
+      console.log(response); // Handle the response as per your requirement
     } catch (error) {
-      // Handle API error
+      console.error(error); // Handle the error as per your requirement
     }
   };
 
@@ -55,11 +46,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
   },
   input: {
-    width: '100%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
