@@ -1,20 +1,31 @@
 
 import React from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { AuthProvider } from './contexts/AuthContext';
-import AppNavigator from './navigation/AppNavigator';
+import RegistrationScreen from './screens/RegistrationScreen';
+import LoginScreen from './screens/LoginScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import AdminUserDetailsScreen from './screens/AdminUserDetailsScreen';
+
+const Stack = createStackNavigator();
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
+    <NavigationContainer>
       <AuthProvider>
+        <StatusBar barStyle="dark-content" />
         <SafeAreaView style={{ flex: 1 }}>
-          <StatusBar barStyle="dark-content" />
-          <AppNavigator />
+          <Stack.Navigator>
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+            <Stack.Screen name="AdminUserDetails" component={AdminUserDetailsScreen} />
+          </Stack.Navigator>
         </SafeAreaView>
       </AuthProvider>
-    </ThemeProvider>
+    </NavigationContainer>
   );
 };
 
