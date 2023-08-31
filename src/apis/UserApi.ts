@@ -4,11 +4,15 @@ import { UserRegistrationRequest, UserRegistrationResponse } from '../types/Type
 
 const BASE_URL = 'https://api.example.com';
 
-export const registerUser = async (request: UserRegistrationRequest): Promise<UserRegistrationResponse> => {
+const registerUser = async (request: UserRegistrationRequest): Promise<UserRegistrationResponse> => {
   try {
     const response = await axios.post(`${BASE_URL}/api/register`, request);
     return response.data;
   } catch (error) {
-    throw new Error(error.response.data.message);
+    throw new Error('Failed to register user');
   }
+};
+
+export default {
+  registerUser,
 };
