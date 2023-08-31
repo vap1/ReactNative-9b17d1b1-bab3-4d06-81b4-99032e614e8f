@@ -1,63 +1,65 @@
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse, User } from '../types/Types';
-import ProfileApi from '../apis/ProfileApi';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse } from '../types/Types';
+import { getUserProfile, updateUserProfile } from '../apis/ProfileApi';
 
-const ProfileScreen: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+interface ProfileScreenProps {
+  token: string;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ token }) => {
   const [name, setName] = useState('');
   const [contactInfo, setContactInfo] = useState('');
   const [address, setAddress] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const request: UserProfileRequest = {
-          token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
-        };
-
-        const response: UserProfileResponse = await ProfileApi.getUserProfile(request);
-        setUser(response.user);
-      } catch (error) {
-        console.error(error); // Handle the error as per your requirement
-      }
-    };
-
     fetchUserProfile();
   }, []);
 
-  const handleUpdateProfile = async () => {
+  const fetchUserProfile = async () => {
+    try {
+      const request: UserProfileRequest = {
+        token,
+      };
+
+      const response: UserProfileResponse = await getUserProfile(request);
+      const { user } = response;
+      setName(user.name);
+      setContactInfo(user.contactInfo || '');
+      setAddress(user.address || '');
+      setProfilePicture(user.profilePicture || '');
+    } catch (error) {
+      console.error(error); // Handle the error as per your requirement
+    }
+  };
+
+  const handleProfileUpdate = async () => {
     try {
       const request: UserProfileUpdateRequest = {
-        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
+        token,
         name,
         contactInfo,
         address,
         profilePicture,
       };
 
-      const response: UserProfileUpdateResponse = await ProfileApi.updateUserProfile(request);
+      const response: UserProfileUpdateResponse = await updateUserProfile(request);
       console.log(response); // Handle the response as per your requirement
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
     }
   };
 
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Profile</Text>
-      <Text>Name: {user.name}</Text>
-      <Text>Email: {user.email}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+      />
       <TextInput
         style={styles.input}
         placeholder="Contact Info"
@@ -76,7 +78,7 @@ const ProfileScreen: React.FC = () => {
         value={profilePicture}
         onChangeText={setProfilePicture}
       />
-      <Button title="Update Profile" onPress={handleUpdateProfile} />
+      <Button title="Save" onPress={handleProfileUpdate} />
     </View>
   );
 };
@@ -86,11 +88,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 16,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
   },
   input: {
     height: 40,
