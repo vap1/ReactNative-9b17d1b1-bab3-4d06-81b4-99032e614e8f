@@ -1,25 +1,20 @@
 
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import RegistrationScreen from './screens/RegistrationScreen';
-import LoginScreen from './screens/LoginScreen';
-import ProfileScreen from './screens/ProfileScreen';
-import AdminUserDetailsScreen from './screens/AdminUserDetailsScreen';
-
-const Stack = createStackNavigator();
+import { SafeAreaView, StyleSheet } from 'react-native';
+import AppNavigator from './navigation/AppNavigator';
 
 const App: React.FC = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Registration">
-        <Stack.Screen name="Registration" component={RegistrationScreen} options={{ title: 'Registration' }} />
-        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
-        <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
-        <Stack.Screen name="AdminUserDetails" component={AdminUserDetailsScreen} options={{ title: 'Admin User Details' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SafeAreaView style={styles.container}>
+      <AppNavigator />
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default App;
