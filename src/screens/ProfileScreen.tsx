@@ -1,46 +1,82 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { UserProfileRequest, UserProfileResponse, User } from '../types/Types';
-import { getUserProfile } from '../apis/ProfileApi';
+import { UserProfileRequest, UserProfileResponse, UserProfileUpdateRequest, UserProfileUpdateResponse, User } from '../types/Types';
+import ProfileApi from '../apis/ProfileApi';
 
 const ProfileScreen: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [name, setName] = useState('');
+  const [contactInfo, setContactInfo] = useState('');
+  const [address, setAddress] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const request: UserProfileRequest = {
+          token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
+        };
+
+        const response: UserProfileResponse = await ProfileApi.getUserProfile(request);
+        setUser(response.user);
+      } catch (error) {
+        console.error(error); // Handle the error as per your requirement
+      }
+    };
+
     fetchUserProfile();
   }, []);
 
-  const fetchUserProfile = async () => {
+  const handleUpdateProfile = async () => {
     try {
-      const request: UserProfileRequest = {
-        token: 'JWT_TOKEN', // Replace with the actual JWT token
+      const request: UserProfileUpdateRequest = {
+        token: 'YOUR_AUTH_TOKEN', // Replace with the actual token
+        name,
+        contactInfo,
+        address,
+        profilePicture,
       };
 
-      const response: UserProfileResponse = await getUserProfile(request);
-      setUser(response.user);
+      const response: UserProfileUpdateResponse = await ProfileApi.updateUserProfile(request);
+      console.log(response); // Handle the response as per your requirement
     } catch (error) {
       console.error(error); // Handle the error as per your requirement
     }
   };
 
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>User Profile</Text>
-      {user && (
-        <View style={styles.userContainer}>
-          <Text style={styles.label}>Name:</Text>
-          <Text>{user.name}</Text>
-          <Text style={styles.label}>Email:</Text>
-          <Text>{user.email}</Text>
-          <Text style={styles.label}>Contact Info:</Text>
-          <Text>{user.contactInfo}</Text>
-          <Text style={styles.label}>Address:</Text>
-          <Text>{user.address}</Text>
-          <Text style={styles.label}>Profile Picture:</Text>
-          <Text>{user.profilePicture}</Text>
-        </View>
-      )}
+      <Text style={styles.heading}>Profile</Text>
+      <Text>Name: {user.name}</Text>
+      <Text>Email: {user.email}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Contact Info"
+        value={contactInfo}
+        onChangeText={setContactInfo}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Address"
+        value={address}
+        onChangeText={setAddress}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Profile Picture"
+        value={profilePicture}
+        onChangeText={setProfilePicture}
+      />
+      <Button title="Update Profile" onPress={handleUpdateProfile} />
     </View>
   );
 };
@@ -56,11 +92,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
   },
-  userContainer: {
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
     marginBottom: 16,
-  },
-  label: {
-    fontWeight: 'bold',
+    paddingHorizontal: 8,
   },
 });
 
