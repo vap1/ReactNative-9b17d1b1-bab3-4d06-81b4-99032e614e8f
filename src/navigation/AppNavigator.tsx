@@ -1,13 +1,20 @@
 
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
 import RegistrationScreen from '../screens/RegistrationScreen';
 import LoginScreen from '../screens/LoginScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AdminUserDetailsScreen from '../screens/AdminUserDetailsScreen';
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  Registration: undefined;
+  Login: undefined;
+  Profile: undefined;
+  AdminUserDetails: undefined;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
   return (
